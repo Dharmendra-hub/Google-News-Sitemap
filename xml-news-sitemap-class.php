@@ -99,14 +99,28 @@ class WPSEO_XML_News_Sitemap {
 				$publication_lang = substr( get_locale(), 0, 2 );
 
 				$keywords = explode( ',', trim( wpseo_get_value( 'newssitemap-keywords', $item->ID ) ) );
+
 				$tags     = get_the_terms( $item->ID, 'post_tag' );
 				if ( $tags )
 					foreach ( $tags as $tag )
 						$keywords[] = $tag->name;
+                                
+                                $categories     = get_the_terms( $item->ID, 'category' );
 
-				// TODO: add suggested keywords to each post based on category, next to the entire site
+                                if ( $categories )
+					foreach ( $categories as $category )
+						$keywords[] = $category->name;
+                                
+                                $markets     = get_the_terms( $item->ID, 'market' );
+                                if ( $markets )
+					foreach ( $markets as $market )
+						$keywords[] = $market->name;
+
+                                // TODO: add suggested keywords to each post based on category, next to the entire site
 				if ( isset( $this->options['newssitemap_default_keywords'] ) && $this->options['newssitemap_default_keywords'] != '' )
-					array_merge( $keywords, explode( ',', $this->options['newssitemap_default_keywords'] ) );
+					$keywords = array_merge( $keywords, explode( ',', $this->options['newssitemap_default_keywords'] ) );
+                                
+                                $keywords = array_filter($keywords);
 				$keywords = strtolower(  trim( implode( ', ', $keywords ), ', ' ) );
 
 				$genre = wpseo_get_value( 'newssitemap-genre', $item->ID );
